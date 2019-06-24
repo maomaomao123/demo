@@ -1,0 +1,49 @@
+﻿<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>test</title>
+    <meta name="Robots" content="All" />
+    <meta name="viewport" content="initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,width=device-width, user-scalable=no, minimal-ui">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="black" name="apple-mobile-web-app-status-bar-style">
+    <meta content="telephone=no, email=no" name="format-detection">
+    <style>
+        .box{
+            margin:100px;
+            width:745px;
+            height:auto;
+            border: 1px solid #31c27c;
+            position: relative;
+            padding: 10px 16px;
+        }
+        .box:after{
+            content:'';
+            position:absolute;
+            top:-8px;
+            right: 0px;
+            width: 10px;
+            background: #fff;
+            height: 10px;
+            border-left:1px solid #31c27c;
+            border-top:1px solid #31c27c;
+            transform:rotate(45deg);
+            transform-origin: center bottom;
+        }
+        .boxIndex1:after{
+            right: 100px;
+        }
+        .boxIndex2:after{
+            right: 200px;
+        }
+    </style>
+</head>
+<body>
+    <div class="box boxIndex1">
+        123
+    </div>
+    <div class="box boxIndex2">
+           123 
+    </div>
+</body>
+</html>
