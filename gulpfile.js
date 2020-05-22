@@ -1,20 +1,28 @@
 const gulp = require('gulp');
 const less = require('gulp-less');
+const stylus = require('gulp-stylus'); // styl文件编译
 const rename = require('gulp-rename');
 const del = require('del');
 const imagemin = require('gulp-imagemin');
 const path = require('path');
-// const autoprefixer = require('gulp-autoprefixer'); // css前缀
+const autoprefixer = require('gulp-autoprefixer'); // css前缀
 const babel = require('gulp-babel'); // babel插件，编译es6的
+const cleanCss = require('gulp-clean-css'); // css压缩
+const htmlmin = require('gulp-htmlmin'); // html压缩
+const uglify = require('gulp-uglify'); // js压缩
+const jsonminify = require('gulp-jsonminify2'); // json压缩
 // const eslint = require('gulp-eslint');
 
 const srcPath = './src/**';
 const distPath = './dist/';
 const wxmlFiles = [`${srcPath}/*.wxml`, `!${srcPath}/_template/*.wxml`];
-const lessFiles = [
+const cssFiles = [
     `${srcPath}/*.less`,
     `!${srcPath}/styles/**/*.less`,
-    `!${srcPath}/_template/*.less`
+    `!${srcPath}/_template/*.less`,
+    `${srcPath}/*.styl`,
+    `!${srcPath}/styles/**/*.styl`,
+    `!${srcPath}/_template/*.styl`
 ];
 const jsonFiles = [`${srcPath}/*.json`, `!${srcPath}/_template/*.json`];
 const jsFiles = [`${srcPath}/*.js`, `!${srcPath}/_template/*.js`, `!${srcPath}/env/*.js`];
@@ -33,6 +41,11 @@ gulp.task('clean', done => {
 const wxml = () => {
     return gulp
         .src(wxmlFiles, { since: gulp.lastRun(wxml) })
+        .pipe(htmlmin({
+            collapseWhitespace: true, // 压缩HTML
+            removeComments: true, // 清除HTML注释
+            keepClosingSlash: true // 保持元素末尾的斜杠
+        }))
         .pipe(gulp.dest(distPath));
 };
 gulp.task(wxml);
@@ -42,6 +55,9 @@ const js = () => {
     return gulp
         .src(jsFiles, { since: gulp.lastRun(js) })
         .pipe(babel())
+        .pipe(uglify({
+            compress: true,
+        }))
         // .pipe(eslint())
         // .pipe(eslint.format())
         .pipe(gulp.dest(distPath));
@@ -68,6 +84,7 @@ gulp.task('prodEnv', envJs('production'));
 const json = () => {
     return gulp
         .src(jsonFiles, { since: gulp.lastRun(json) })
+        .pipe(jsonminify())
         .pipe(gulp.dest(distPath));
 };
 gulp.task(json);
@@ -75,9 +92,11 @@ gulp.task(json);
 /* 编译less文件 */
 const wxss = () => {
     return gulp
-        .src(lessFiles)
-        // .pipe(autoprefixer(['last 2 versions', 'iOS >= 8', 'Android >= 4.0']))
+        .src(cssFiles)
+        .pipe(autoprefixer(['last 2 versions', 'iOS >= 8', 'Android >= 4.0']))
         .pipe(less())
+        .pipe(stylus())
+        .pipe(cleanCss({keepSpecialComments: '*'}))
         .pipe(rename({ extname: '.wxss' }))
         .pipe(gulp.dest(distPath));
 };
@@ -94,9 +113,9 @@ gulp.task(img);
 
 /* watch */
 gulp.task('watch', () => {
-    let watchLessFiles = [...lessFiles];
-    watchLessFiles.pop();
-    gulp.watch(watchLessFiles, wxss);
+    let watchcssFiles = [...cssFiles];
+    watchcssFiles.pop();
+    gulp.watch(watchcssFiles, wxss);
     gulp.watch(jsFiles, js);
     gulp.watch(imgFiles, img);
     gulp.watch(jsonFiles, json);

@@ -1,14 +1,10 @@
 <!-- <import src="../../../../components/loading/loading.tpl.wxml" /> -->
 <view>
-    <!-- <button>
-        <image src="/assets/images/icon-wechat_3.png"></image>
-        <text>保存图片</text>
-    </button> -->
-    <view class="showCanvas" style="width:100%;height:100vh;background-color:rgba(0,0,0,.5);">
+    <view class="showCanvas">
         <view style="width:{{canvasWidth}}px;height:{{canvasHeight}}px;margin:0 auto;padding-top:100rpx">
             <canvas type="2d" id="canvasBox" style="width:100%;height:100%;" disable-scroll="true"></canvas>
         </view>
-        <view class="save" style="width: 200rpx;height:200rpx" catchtap="save">保存图片</view>
+        <view class="save" catchtap="save">保存图片</view>
     </view>
 </view>
 <!-- <template is="loading" data="{{ ...loading }}" /> -->
