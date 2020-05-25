@@ -128,6 +128,13 @@ let pageA = {
     },
     // 查询节点信息，并准备绘制图像
     initDraw() {
+        if (this.data.sharePic){
+            this.setData({
+                shareChoose: false,
+                showCanvas: true
+            })
+            return
+        }
         const query = wx.createSelectorQuery();  // 创建一个dom元素节点查询器
         query.select('#canvasBox')              // 选择我们的canvas节点
             .fields({                             // 需要获取的节点相关信息
