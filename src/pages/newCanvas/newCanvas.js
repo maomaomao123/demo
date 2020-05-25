@@ -34,7 +34,8 @@ let pageA = {
                 goods_img: 'https://image.carisok.com/filesrv/beta/uploads/store_0/goods_95/202005061451353748.png',
                 goods_title: '撒旦法测试商品专用',
                 original_price: '',
-            }
+            },
+
         ],
 
         // 设置区，针对部件的数据设置
@@ -54,7 +55,11 @@ let pageA = {
 
         windowWidth: 0,
         windowHeight: 0,
-        rpx: null
+        rpx: null,
+
+        shareChoose: false, // 分享按钮视图
+        showCanvas: false, //canvas视图
+        sharePic: null, //分享图
     },
     _data: {
     },
@@ -66,6 +71,7 @@ let pageA = {
             'loading.visiable': bool
         });
     },
+
     onLoad(options) {
         let that = this;
         wx.getSystemInfo({
@@ -106,7 +112,19 @@ let pageA = {
     onUnload() {
     },
     onReady() {
-        this.initDraw();
+        // this.initDraw();
+    },
+    shareShow() {
+        this.setData({
+            shareChoose: !this.data.shareChoose
+        })
+    },
+    // 隐藏所有的元素
+    hideMask() {
+        this.setData({
+            showCanvas: false,
+            shareChoose: false
+        });
     },
     // 查询节点信息，并准备绘制图像
     initDraw() {
@@ -139,6 +157,7 @@ let pageA = {
                 that.drawGoods();
                 that.drawQrcode();           // 绘制小程序码
                 that.drawStoreInfo();
+                that.createTempFile()
                 wx.hideLoading(); // 隐藏loading
             });
     },
@@ -149,7 +168,6 @@ let pageA = {
             let poster = that.data.canvas.createImage();          // 创建一个图片对象
             poster.src = that.data.posterUrl;               // 图片对象地址赋值
             poster.onload = () => {
-                console.log('onload', poster.width, poster.height);
                 that.computeCanvasSize(poster.width, poster.height) // 计算画布尺寸
                     .then(function (res) {
                         that.data.ctx.save();
@@ -166,7 +184,6 @@ let pageA = {
         return new Promise(function (resolve, reject) {
             let canvasWidth = that.data.windowWidth - 60;  // 获取画布宽度
             let canvasHeight = Math.floor(canvasWidth * (imgHeight / imgWidth));       // 计算海报高度
-            console.log('computeCanvasSize', canvasWidth, canvasHeight);
             that.setData({
                 canvasWidth: canvasWidth,                                   // 设置画布容器宽
                 canvasHeight: canvasHeight,                                 // 设置画布容器高
@@ -203,7 +220,7 @@ let pageA = {
             photo.src = `${this.data.share_goods[i].goods_img}?x-oss-process=image/resize,w_${photoGoods},h_${photoGoods}`;
             photo.onload = () => {
                 this.data.ctx.save();
-                this.data.ctx.drawImage(photo, 0, 0, photoGoods, photoGoods, basicGoodsX, 180 * this.data.scaleNum, photoGoods, photoGoods); // 详见 
+                this.data.ctx.drawImage(photo, 0, 0, photoGoods, photoGoods, basicGoodsX, 180 * this.data.scaleNum, photoGoods, photoGoods); // 详见
                 this.data.ctx.restore();
             };
             // 名称
@@ -279,6 +296,34 @@ let pageA = {
         }
         this.data.ctx.restore();
     },
+    // 生成临时图片
+    createTempFile() {
+        let that = this
+        let timer = setTimeout(() => {
+            wx.canvasToTempFilePath({
+                fileType: 'jpg',
+                canvas: that.data.canvas, //现在的写法
+                width: that.data.canvas.width,
+                height: that.data.canvas.height,
+                x: 0,
+                y: 0,
+                destWidth: that.data.canvas.width,
+                destHeight: that.data.canvas.height,
+                success: (res) => {
+                    that.setData({
+                        sharePic: res.tempFilePath
+                    })
+                },
+                fail(res) {
+                    console.log(res);
+                }
+            });
+            that.setData({
+                shareChoose: false,
+                showCanvas: true
+            })
+        }, 500)
+    },
     // 保存图片
     save() {
         let that = this;
@@ -292,7 +337,6 @@ let pageA = {
             destWidth: that.data.canvas.width,
             destHeight: that.data.canvas.height,
             success: (res) => {
-                console.log(res);
                 //保存图片
                 wx.saveImageToPhotosAlbum({
                     filePath: res.tempFilePath,
@@ -304,7 +348,6 @@ let pageA = {
                         });
                     },
                     fail: function (err) {
-                        console.log(err);
                         if (err.errMsg === 'saveImageToPhotosAlbum:fail auth deny') {
                             console.log('当初用户拒绝，再次发起授权');
                         } else {
@@ -313,7 +356,6 @@ let pageA = {
                     },
                     complete(res) {
                         wx.hideLoading();
-                        console.log(res);
                     }
                 });
             },

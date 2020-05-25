@@ -27,8 +27,8 @@ const cssFiles = [
 const jsonFiles = [`${srcPath}/*.json`, `!${srcPath}/_template/*.json`];
 const jsFiles = [`${srcPath}/*.js`, `!${srcPath}/_template/*.js`, `!${srcPath}/env/*.js`];
 const imgFiles = [
-    `${srcPath}/images/*.{png,jpg,gif,ico}`,
-    `${srcPath}/images/**/*.{png,jpg,gif,ico}`
+    `${srcPath}/*.{png,jpg,gif,ico}`,
+    `${srcPath}/**/*.{png,jpg,gif,ico}`
 ];
 
 /* 清除dist目录 */
