@@ -159,17 +159,19 @@ let pageA = {
     drawing() {
         let that = this;
         wx.showLoading({ title: '生成中' });
-        that.drawPoster().then(function () {
-            that.drawGoods().then(function () {
-                that.drawQrcode().then(function () {
-                    that.drawStoreInfo().then(function () {
-                        that.createTempFile().then(function () {
+        that.drawPoster().then(() => {
+            that.drawGoods().then(() => {
+                that.drawQrcode().then(() => {
+                    that.drawStoreInfo().then(() => {
+                        that.createTempFile().then(() => {
                             that.setData({
                                 shareChoose: false,
                                 showCanvas: true
                             })
                             wx.hideLoading();
-                        })
+                        }).catch((err) => {
+                            wx.hideLoading();
+                        });
                     })
                 })
             })
@@ -346,46 +348,31 @@ let pageA = {
                         reject(res)
                     }
                 });
-            }, 200)
+            }, 1000)
         });
     },
     // 保存图片
     save() {
         let that = this;
-        wx.canvasToTempFilePath({
-            fileType: 'jpg',
-            canvas: that.data.canvas, //现在的写法
-            width: that.data.canvas.width,
-            height: that.data.canvas.height,
-            x: 0,
-            y: 0,
-            destWidth: that.data.canvas.width,
-            destHeight: that.data.canvas.height,
-            success: (res) => {
-                //保存图片
-                wx.saveImageToPhotosAlbum({
-                    filePath: res.tempFilePath,
-                    success: function (data) {
-                        wx.showToast({
-                            title: '已保存到相册',
-                            icon: 'success',
-                            duration: 2000
-                        });
-                    },
-                    fail: function (err) {
-                        if (err.errMsg === 'saveImageToPhotosAlbum:fail auth deny') {
-                            console.log('当初用户拒绝，再次发起授权');
-                        } else {
-                            util.showToast('请截屏保存分享');
-                        }
-                    },
-                    complete(res) {
-                        wx.hideLoading();
-                    }
+        //保存图片
+        wx.saveImageToPhotosAlbum({
+            filePath: that.data.sharePic,
+            success: function (data) {
+                wx.showToast({
+                    title: '已保存到相册',
+                    icon: 'success',
+                    duration: 2000
                 });
             },
-            fail(res) {
-                console.log(res);
+            fail: function (err) {
+                if (err.errMsg === 'saveImageToPhotosAlbum:fail auth deny') {
+                    console.log('当初用户拒绝，再次发起授权');
+                } else {
+                    util.showToast('请截屏保存分享');
+                }
+            },
+            complete(res) {
+                wx.hideLoading();
             }
         });
     }
