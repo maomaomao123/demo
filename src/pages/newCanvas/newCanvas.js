@@ -157,20 +157,27 @@ let pageA = {
     },
     // 绘制画面
     drawing() {
-        const that = this;
-        wx.showLoading({ title: '生成中' }); // 显示loading
-        that.drawPoster()               // 绘制海报
-            .then(function () {           // 这里用同步阻塞一下，因为需要先拿到海报的高度计算整体画布的高度
-                that.drawGoods();
-                that.drawQrcode();           // 绘制小程序码
-                that.drawStoreInfo();
-                that.createTempFile()
-                wx.hideLoading(); // 隐藏loading
-            });
+        let that = this;
+        wx.showLoading({ title: '生成中' });
+        that.drawPoster().then(function () {
+            that.drawGoods().then(function () {
+                that.drawQrcode().then(function () {
+                    that.drawStoreInfo().then(function () {
+                        that.createTempFile().then(function () {
+                            that.setData({
+                                shareChoose: false,
+                                showCanvas: true
+                            })
+                            wx.hideLoading();
+                        })
+                    })
+                })
+            })
+        });
     },
     // 绘制海报
     drawPoster() {
-        const that = this;
+        let that = this;
         return new Promise(function (resolve, reject) {
             let poster = that.data.canvas.createImage();          // 创建一个图片对象
             poster.src = that.data.posterUrl;               // 图片对象地址赋值
@@ -187,7 +194,7 @@ let pageA = {
     },
     // 计算画布尺寸
     computeCanvasSize(imgWidth, imgHeight) {
-        const that = this;
+        let that = this;
         return new Promise(function (resolve, reject) {
             let canvasWidth = that.data.windowWidth - 60;  // 获取画布宽度
             let canvasHeight = Math.floor(canvasWidth * (imgHeight / imgWidth));       // 计算海报高度
@@ -208,68 +215,79 @@ let pageA = {
     // 门店信息
     drawStoreInfo() {
         let that = this;
-        let basicX = that.data.infoSpace * that.data.scaleNum;
-        // 画布高度 - 小程序码高度 - 底边距 — 微调
-        let basicY = that.data.canvasHeight - (that.data.qrcodeDiam + that.data.infoSpace - 14) * that.data.scaleNum;
-        that.drawText(that.data.store_name, basicX, basicY, 16 * that.data.scaleNum, 2, 260 * that.data.scaleNum); // 门店名称
-        that.drawText(`地址：${that.data.store_address}`, basicX, basicY + 40 * that.data.scaleNum, 10 * that.data.scaleNum, 1, 260 * that.data.scaleNum); // 地址
-        that.drawText(`联系方式：${that.data.store_phone}`, basicX, basicY + 54 * that.data.scaleNum, 10 * that.data.scaleNum, 1, 260 * that.data.scaleNum);
+        return new Promise(function (resolve, reject) {
+            let basicX = that.data.infoSpace * that.data.scaleNum;
+            // 画布高度 - 小程序码高度 - 底边距 — 微调
+            let basicY = that.data.canvasHeight - (that.data.qrcodeDiam + that.data.infoSpace - 14) * that.data.scaleNum;
+            that.drawText(that.data.store_name, basicX, basicY, 16 * that.data.scaleNum, 2, 260 * that.data.scaleNum); // 门店名称
+            that.drawText(`地址：${that.data.store_address}`, basicX, basicY + 40 * that.data.scaleNum, 10 * that.data.scaleNum, 1, 260 * that.data.scaleNum); // 地址
+            that.drawText(`联系方式：${that.data.store_phone}`, basicX, basicY + 54 * that.data.scaleNum, 10 * that.data.scaleNum, 1, 260 * that.data.scaleNum);
+            resolve()
+        });
     },
     // 绘制商品
     drawGoods() {
-        let photoGoods = Math.floor((this.data.windowWidth - 60 - 5 * 5 * this.data.scaleNum) / 4); // 宽度
-        let basicGoodsY = photoGoods + (180 + 20) * this.data.scaleNum; // 商品名称高度
-        this.data.ctx.fillStyle = '#ffffff'; // 设置商品背景色
-        for (let i = 0; i < this.data.share_goods.length; i++) {
-            let basicGoodsX = photoGoods * i + 5 * (i + 1) * this.data.scaleNum;
-            this.data.ctx.fillRect(basicGoodsX, 180 * this.data.scaleNum, photoGoods, 180 * this.data.scaleNum); // 填充
-            let photo = this.data.canvas.createImage();       // 创建一个图片对象
-            photo.src = `${this.data.share_goods[i].goods_img}?x-oss-process=image/resize,w_${photoGoods},h_${photoGoods}`;
-            photo.onload = () => {
-                this.data.ctx.save();
-                this.data.ctx.drawImage(photo, 0, 0, photoGoods, photoGoods, basicGoodsX, 180 * this.data.scaleNum, photoGoods, photoGoods); // 详见
-                this.data.ctx.restore();
-            };
-            // 名称
-            this.drawText(this.data.share_goods[i].goods_title, basicGoodsX + 10 * this.data.scaleNum, basicGoodsY, 10 * this.data.scaleNum, 2, photoGoods - 20 * this.data.scaleNum);
-            // 售价
-            this.drawText(`￥${this.data.share_goods[i].activity_price}`, basicGoodsX + 10 * this.data.scaleNum, basicGoodsY + 40 * this.data.scaleNum, 10 * this.data.scaleNum, 1, photoGoods - 20 * this.data.scaleNum, '#E60014');
-            // 原价
-            if (this.data.share_goods[i].original_price) {
-                this.drawText(`￥${this.data.share_goods[i].original_price}`, basicGoodsX + 10 * this.data.scaleNum + 50 * this.data.scaleNum, basicGoodsY + 40 * this.data.scaleNum, 8 * this.data.scaleNum, 1, photoGoods - 20 * this.data.scaleNum, '#999999');
-                this.data.ctx.moveTo(basicGoodsX + 60 * this.data.scaleNum, basicGoodsY + 37 * this.data.scaleNum); //设置起点状态
-                this.data.ctx.lineTo(basicGoodsX + 100 * this.data.scaleNum, basicGoodsY + 37 * this.data.scaleNum); //设置末端状态
-                this.data.ctx.lineWidth = 1;          //设置线宽状态
-                this.data.ctx.strokeStyle = '#999999';  //设置线的颜色状态
-                this.data.ctx.stroke();               //进行绘制
+        let that = this
+        return new Promise(function (resolve, reject) {
+            let photoGoods = Math.floor((that.data.windowWidth - 60 - 5 * 5 * that.data.scaleNum) / 4); // 宽度
+            let basicGoodsY = photoGoods + (180 + 20) * that.data.scaleNum; // 商品名称高度
+            that.data.ctx.fillStyle = '#ffffff'; // 设置商品背景色
+            for (let i = 0; i < that.data.share_goods.length; i++) {
+                let basicGoodsX = photoGoods * i + 5 * (i + 1) * that.data.scaleNum;
+                that.data.ctx.fillRect(basicGoodsX, 180 * that.data.scaleNum, photoGoods, 180 * that.data.scaleNum); // 填充
+                let photo = that.data.canvas.createImage();       // 创建一个图片对象
+                photo.src = `${that.data.share_goods[i].goods_img}?x-oss-process=image/resize,w_${photoGoods},h_${photoGoods}`;
+                photo.onload = () => {
+                    that.data.ctx.save();
+                    that.data.ctx.drawImage(photo, 0, 0, photoGoods, photoGoods, basicGoodsX, 180 * that.data.scaleNum, photoGoods, photoGoods); // 详见
+                    that.data.ctx.restore();
+                };
+                // 名称
+                that.drawText(that.data.share_goods[i].goods_title, basicGoodsX + 10 * that.data.scaleNum, basicGoodsY, 10 * that.data.scaleNum, 2, photoGoods - 20 * that.data.scaleNum);
+                // 售价
+                that.drawText(`￥${that.data.share_goods[i].activity_price}`, basicGoodsX + 10 * that.data.scaleNum, basicGoodsY + 40 * that.data.scaleNum, 10 * that.data.scaleNum, 1, photoGoods - 20 * that.data.scaleNum, '#E60014');
+                // 原价
+                if (that.data.share_goods[i].original_price) {
+                    that.drawText(`￥${that.data.share_goods[i].original_price}`, basicGoodsX + 10 * that.data.scaleNum + 50 * that.data.scaleNum, basicGoodsY + 40 * that.data.scaleNum, 8 * that.data.scaleNum, 1, photoGoods - 20 * that.data.scaleNum, '#999999');
+                    that.data.ctx.moveTo(basicGoodsX + 60 * that.data.scaleNum, basicGoodsY + 37 * that.data.scaleNum); //设置起点状态
+                    that.data.ctx.lineTo(basicGoodsX + 100 * that.data.scaleNum, basicGoodsY + 37 * that.data.scaleNum); //设置末端状态
+                    that.data.ctx.lineWidth = 1;          //设置线宽状态
+                    that.data.ctx.strokeStyle = '#999999';  //设置线的颜色状态
+                    that.data.ctx.stroke();               //进行绘制
+                }
             }
-        }
-
+            resolve()
+        });
     },
     // 绘制小程序码
     drawQrcode() {
-        let diam = Math.floor(this.data.qrcodeDiam * this.data.scaleNum);  // 小程序码直径
-        let space = this.data.infoSpace * this.data.scaleNum; // 间隔
-        let qrcode = this.data.canvas.createImage();       // 创建一个图片对象
-        qrcode.src = `${this.data.qrcodeUrl}?x-oss-process=image/resize,w_${diam},h_${diam}`; // 图片对象地址赋值
-        qrcode.onload = () => {                                        // 半径，alpiny敲碎了键盘
-            let x = this.data.canvasWidth - space - diam;        // 左上角相对X轴的距离：画布宽 - 间隔 - 直径
-            let y = this.data.canvasHeight - space - diam;   // 左上角相对Y轴的距离 ：画布高 - 间隔 - 直径 + 微调
-            this.data.ctx.save();
-            this.data.ctx.drawImage(qrcode, 0, 0, qrcode.width, qrcode.height, x, y, diam, diam); // 详见 drawImage 用法
-            this.data.ctx.restore();
-        };
+        let that = this
+        return new Promise(function (resolve, reject) {
+            let diam = Math.floor(that.data.qrcodeDiam * that.data.scaleNum);  // 小程序码直径
+            let space = that.data.infoSpace * that.data.scaleNum; // 间隔
+            let qrcode = that.data.canvas.createImage();       // 创建一个图片对象
+            qrcode.src = `${that.data.qrcodeUrl}?x-oss-process=image/resize,w_${diam},h_${diam}`; // 图片对象地址赋值
+            qrcode.onload = () => {                                        // 半径，alpiny敲碎了键盘
+                let x = that.data.canvasWidth - space - diam;        // 左上角相对X轴的距离：画布宽 - 间隔 - 直径
+                let y = that.data.canvasHeight - space - diam;   // 左上角相对Y轴的距离 ：画布高 - 间隔 - 直径 + 微调
+                that.data.ctx.save();
+                that.data.ctx.drawImage(qrcode, 0, 0, qrcode.width, qrcode.height, x, y, diam, diam); // 详见 drawImage 用法
+                that.data.ctx.restore();
+            };
+            resolve()
+        });
     },
     // 绘制文字 参数 文字text,文字大小fontSize,x,y
     drawText(text, x, y, fontSize, maxLine = 1, maxWidth, color = '#3b3b3b') {
-        this.data.ctx.save();
-        this.data.ctx.font = `${fontSize}px normal` || '16px normal';             // 设置字体大小
-        this.data.ctx.fillStyle = color;           // 设置文字颜色
+        let that = this
+        that.data.ctx.save();
+        that.data.ctx.font = `${fontSize}px normal` || '16px normal';             // 设置字体大小
+        that.data.ctx.fillStyle = color;           // 设置文字颜色
         let chr = text.split('');
         let temp = '';
         let row = [];
         for (var a = 0; a < chr.length; a++) {
-            if (this.data.ctx.measureText(temp).width < maxWidth) {
+            if (that.data.ctx.measureText(temp).width < maxWidth) {
                 temp += chr[a];
             }
             else {
@@ -286,7 +304,7 @@ let pageA = {
             var test = '';
             var empty = [];
             for (var a = 0; a < rowPart.length; a++) {
-                if (this.data.ctx.measureText(test).width < maxWidth - 25 * this.data.scaleNum) {
+                if (that.data.ctx.measureText(test).width < maxWidth - 25 * that.data.scaleNum) {
                     test += rowPart[a];
                 }
                 else {
@@ -299,37 +317,37 @@ let pageA = {
             row = rowCut;
         }
         for (var b = 0; b < row.length; b++) {
-            this.data.ctx.fillText(row[b], x, y + b * (fontSize + 2), 300);
+            that.data.ctx.fillText(row[b], x, y + b * (fontSize + 2), 300);
         }
-        this.data.ctx.restore();
+        that.data.ctx.restore();
     },
     // 生成临时图片
     createTempFile() {
         let that = this
-        let timer = setTimeout(() => {
-            wx.canvasToTempFilePath({
-                fileType: 'jpg',
-                canvas: that.data.canvas, //现在的写法
-                width: that.data.canvas.width,
-                height: that.data.canvas.height,
-                x: 0,
-                y: 0,
-                destWidth: that.data.canvas.width,
-                destHeight: that.data.canvas.height,
-                success: (res) => {
-                    that.setData({
-                        sharePic: res.tempFilePath
-                    })
-                },
-                fail(res) {
-                    console.log(res);
-                }
-            });
-            that.setData({
-                shareChoose: false,
-                showCanvas: true
-            })
-        }, 500)
+        return new Promise(function (resolve, reject) {
+            let timer = setTimeout(() => {
+                wx.canvasToTempFilePath({
+                    fileType: 'jpg',
+                    canvas: that.data.canvas, //现在的写法
+                    width: that.data.canvas.width,
+                    height: that.data.canvas.height,
+                    x: 0,
+                    y: 0,
+                    destWidth: that.data.canvas.width,
+                    destHeight: that.data.canvas.height,
+                    success: (res) => {
+                        that.setData({
+                            sharePic: res.tempFilePath
+                        })
+                        resolve()
+                    },
+                    fail(res) {
+                        console.log(res);
+                        reject(res)
+                    }
+                });
+            }, 200)
+        });
     },
     // 保存图片
     save() {
