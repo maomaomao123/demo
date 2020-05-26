@@ -8,9 +8,9 @@
 	<template is="indexTpl" data="{{num}}" />
 
 	<components-demo num="{{num}}" bindaddNum="addNum"></components-demo>
-	<veiw style="margin-top:50rpx">
-		<navigator url="/pages/newCanvas/newCanvas" open-type="navigate" class="uploader-text">
-		<text>canvasDemo</text>
+    <veiw style="margin-top:50rpx">
+		<navigator url="/pages/activity/activity" open-type="navigate" class="uploader-text">
+		<text>activity</text>
 		</navigator>
 	</veiw>
 </view>

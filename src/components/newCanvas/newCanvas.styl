@@ -1,0 +1,154 @@
+.shareButton{
+    position: absolute;
+    width: 68rpx;
+    height: 68rpx;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    right: 30rpx;
+    top: 20rpx;
+    z-index: 999;
+    text{
+        font-size: $fontLarge;
+        color: $fcWhite;
+        line-height: $fontSmall;
+    }
+}
+
+.mask,.mask-t{
+    position: fixed;
+    z-index: 9999;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    width: 100%;
+    height: 100%;
+}
+
+.maskZero{
+    background-color: rgba(0,0,0,0);
+}
+
+.mask-t{
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.share-choose{
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 370rpx;
+    // border-top: 140rpx solid #f2f3f2;
+    background-color: #f0f0f0;
+    .close{
+        position: absolute;
+        bottom: 0;
+        text-align: center;
+        width: 750rpx;
+        height: 88rpx;
+        font-size: 28rpx;
+        line-height: 88rpx;
+        background-color: #fff;
+        border-top: 1px solid #efefef;
+    }
+    .share-target{
+        display: flex;
+        flex-direction: column;
+        .share-model-title{
+            margin-top: 31rpx;
+            margin-left: 24rpx;
+        }
+        text{
+            font-size: 24rpx;
+        }
+        image{
+            width: 108rpx;
+            height: 108rpx;
+        }
+        .share-model{
+            display: flex;
+            display: row;
+            justify-content: space-between;
+            padding: 0 172rpx;
+        }
+
+        .share-model-friends{
+            border: none !important;
+            background-color: transparent;
+            display: flex;
+            flex-direction: column;
+            &::after{
+                border:none;
+            }
+        }
+    }
+
+}
+
+
+
+
+
+.showCanvas{
+    position: fixed;
+    z-index: 9999;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    width: 100%;
+    height: 100%;
+    .canvas{
+        position: absolute;
+        left: 0%;
+        top:-9999%;
+        transform: translate(0%, 0%);
+    }
+    .sharePic{
+        display: block;
+        width: 628rpx;
+        height: 898rpx;
+        position: absolute;
+        top: 100rpx;
+        left: 50%;
+        transform: translate(-50%, 0)
+    }
+    .save{
+        width: 376rpx;
+        height: 88rpx;
+        background-color: rgb(15,135,234);
+        border-radius: 8rpx;
+        position: absolute;
+        bottom: 70rpx;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+        line-height: 88rpx;
+        color: white;
+    }
+}
+
+
+// 字体图标
+@font-face {
+  font-family: 'iconfont';  /* project id 625500 */
+  src: url('//at.alicdn.com/t/font_625500_o01hzgjuuzn.eot');
+  src: url('//at.alicdn.com/t/font_625500_o01hzgjuuzn.eot?#iefix') format('embedded-opentype'),
+  url('https://at.alicdn.com/t/font_625500_o01hzgjuuzn.woff2') format('woff2'),
+  url('https://at.alicdn.com/t/font_625500_o01hzgjuuzn.woff') format('woff'),
+  url('https://at.alicdn.com/t/font_625500_o01hzgjuuzn.ttf') format('truetype'),
+  url('https://at.alicdn.com/t/font_625500_o01hzgjuuzn.svg#iconfont') format('svg');
+}
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.icon-fenxiang:before {
+  content: "\e627";
+}
+

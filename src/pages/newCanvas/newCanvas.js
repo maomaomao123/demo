@@ -136,6 +136,7 @@ let pageA = {
             return
         }
         const query = wx.createSelectorQuery();  // 创建一个dom元素节点查询器
+        console.log(query, 'query')
         query.select('#canvasBox')              // 选择我们的canvas节点
             .fields({                             // 需要获取的节点相关信息
                 node: true,                         // 是否返回节点对应的 Node 实例

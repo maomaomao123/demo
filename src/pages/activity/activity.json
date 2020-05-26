@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "这是标题",
+  "usingComponents": {
+      "new-canvas": "../../components/newCanvas/newCanvas"
+  }
+}

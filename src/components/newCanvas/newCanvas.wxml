@@ -1,0 +1,33 @@
+<!-- <import src="../../../../components/loading/loading.tpl.wxml" /> -->
+<view>
+    <!-- canvas -->
+    <view class="showCanvas" wx:hidden="{{showCanvas ? false : true}}" style="visibility:{{!showCanvas ? 'hidden': 'visible'}};" catchtap="hideMask">
+        <canvas class="canvas" type="2d" id="canvasBox" style="width:{{canvasWidth}}px;height:{{canvasHeight}}px"></canvas>
+        <image class="sharePic" src="{{sharePic}}" wx:if="{{sharePic}}"></image>
+        <view class="save" catchtap="save">保存图片</view>
+    </view>
+    <!-- 分享图标 -->
+    <view class="shareButton" catchtap="shareShow">
+        <text class="iconfont icon-fenxiang"></text>
+    </view>
+    <!-- 分享按钮 -->
+    <view class="mask" catchtap="hideMask" style="visibility:{{!shareChoose?'hidden':'visible'}}">
+        <view class="share-choose">
+            <view class="share-target">
+                <view class="share-model-title"><text>分享至</text></view>
+                <view class="share-model">
+                    <button class="share-model-friends" open-type="share" data-buttonType="0">
+                        <image src="../../assets/images/icon-wechat_1.png"></image>
+                        <text>微信好友</text>
+                    </button>
+                    <button class="share-model-friends" catchtap="initDraw" wx:if="{{shareData}}">
+                        <image src="../../assets/images/icon-wechat_3.png"></image>
+                        <text>保存图片</text>
+                    </button>
+                </view>
+            </view>
+            <view catchtap="hideMask" class="close" >取消</view>
+        </view>
+</view>
+
+<!-- <template is="loading" data="{{ ...loading }}" /> -->

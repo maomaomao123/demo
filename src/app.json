@@ -1,7 +1,8 @@
 {
   "pages": [
     "pages/index/index",
-    "pages/newCanvas/newCanvas"
+    "pages/newCanvas/newCanvas",
+    "pages/activity/activity"
   ],
   "window": {
     "navigationBarBackgroundColor": "#ffffff",
