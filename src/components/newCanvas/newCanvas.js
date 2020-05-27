@@ -285,48 +285,43 @@ Component({
         // 保存图片
         save() {
             let that = this;
-            wx.getSetting({
-                success: (res) => {
-                    if (res.authSetting['scope.writePhotosAlbum']) {
-                        that.saveImg()
-                    } else {
-                        wx.showModal({
-                            title: '是否授权保存到相册',
-                            content: '需要获取您的保存图片权限，请确认授权，否则图片将无法保存到相册',
-                            success: function (res) {
-                                if (res.confirm) {
-                                    wx.openSetting({
-                                        success: function (data) {
-                                            if (data.authSetting["scope.writePhotosAlbum"] === true) {
-                                                that.saveImg()
-                                            } else {
-                                                console.log('用户点击取消')
+            wx.saveImageToPhotosAlbum({
+                filePath: that.data.sharePic,
+                success: function (res) {
+                    wx.showToast({
+                        title: '保存成功',
+                    })
+                },
+                fail: function (err) {
+                    if (err.errMsg === "saveImageToPhotosAlbum:fail auth deny") {
+                        wx.getSetting({
+                            success(settingdata) {
+                                if (!settingdata.authSetting['scope.writePhotosAlbum']) {
+                                    wx.showModal({
+                                        title: '提示',
+                                        content: '需要获取您的保存图片权限，请确认授权，否则图片将无法保存到相册',
+                                        success: function (res) {
+                                            if (res.confirm) {
+                                                wx.openSetting({
+                                                    success(res) {
+                                                        console.log(res);
+                                                    },
+                                                    fail(res) {
+                                                        console.log(res);
+                                                    }
+                                                });
                                             }
                                         }
                                     })
+                                } else {
+                                    console.log('获取权限失败')
                                 }
                             }
                         })
                     }
-                },
-                fail: function (res) { },
+                }
             })
         },
-        saveImg() {
-            let that = this
-            wx.saveImageToPhotosAlbum({
-                filePath: that.data.sharePic,
-                success: function (data) {
-                    wx.showToast({
-                        title: '已保存到相册',
-                        icon: 'success',
-                        duration: 2000
-                    });
-                },
-                fail: function (err) {
-                },
-            });
-        }
     }
 
 })
