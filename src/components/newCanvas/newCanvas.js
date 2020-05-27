@@ -26,12 +26,17 @@ Component({
         shareChoose: false, // 分享按钮视图
         showCanvas: false, //canvas视图
         sharePic: null, //分享图-存放临时路径
+        canvasId: null
     },
     created: function () {
     },
     attached: function () { },
     ready: function () {
         let that = this;
+        that.setData({
+            canvasId: `canvas_${parseInt(Math.random() * 1000)}`
+        })
+        console.log(that.data.canvasId,'canvasId')
         wx.getSystemInfo({
             success: function (res) {
                 that.setData({
@@ -67,7 +72,7 @@ Component({
                 return
             }
             const query = this.createSelectorQuery();  // 创建一个dom元素节点查询器
-            query.select('#canvasBox')              // 选择我们的canvas节点
+            query.select(`#${this.data.canvasId}`)              // 选择我们的canvas节点
                 .fields({                             // 需要获取的节点相关信息
                     node: true,                         // 是否返回节点对应的 Node 实例
                     size: true                          // 是否返回节点尺寸（width height）

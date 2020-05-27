@@ -2,7 +2,7 @@
 <view>
     <!-- canvas -->
     <view class="showCanvas" wx:hidden="{{showCanvas ? false : true}}" style="visibility:{{!showCanvas ? 'hidden': 'visible'}};" catchtap="hideMask">
-        <canvas class="canvas" type="2d" id="canvasBox" style="width:{{canvasWidth}}px;height:{{canvasHeight}}px"></canvas>
+        <canvas class="canvas" type="2d" id="{{canvasId}}" style="width:{{canvasWidth}}px;height:{{canvasHeight}}px"></canvas>
         <image class="sharePic" src="{{sharePic}}" wx:if="{{sharePic}}"></image>
         <view class="save" catchtap="save">保存图片</view>
     </view>
