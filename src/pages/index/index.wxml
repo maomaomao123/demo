@@ -13,4 +13,9 @@
 		<text>activity</text>
 		</navigator>
 	</veiw>
+    <veiw style="margin-top:50rpx">
+		<navigator url="/pages/wxToCanvas/wxToCanvas" open-type="navigate" class="uploader-text">
+		<text>wxToCanvas</text>
+		</navigator>
+	</veiw>
 </view>

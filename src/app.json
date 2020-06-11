@@ -2,7 +2,8 @@
   "pages": [
     "pages/index/index",
     "pages/newCanvas/newCanvas",
-    "pages/activity/activity"
+    "pages/activity/activity",
+    "pages/wxToCanvas/wxToCanvas"
   ],
   "window": {
     "navigationBarBackgroundColor": "#ffffff",
@@ -17,5 +18,7 @@
     "onReachBottomDistance": 50
   },
   "networkTimeout": {},
+  "usingComponents": {
+  },
   "debug": false
 }
