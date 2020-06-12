@@ -1,7 +1,6 @@
 {
   "pages": [
     "pages/index/index",
-    "pages/newCanvas/newCanvas",
     "pages/activity/activity",
     "pages/wxToCanvas/wxToCanvas"
   ],
