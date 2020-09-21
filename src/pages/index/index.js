@@ -7,6 +7,7 @@ Page({
     },
     onLoad() {
     // Do some initialize when page load.
+        console.log(123)
     },
     onReady() {
     // Do something when page ready.
